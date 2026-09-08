@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.setting.DefineUnitSettingController">
+    
+    <Label styleClass="sidebar-title" text="Define Unit" />
+    <Separator />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+           <Label styleClass="sidebar-subtitle" text="Add New Unit:" />
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" />
+               <TextField fx:id="newUnitName" prefHeight="26.0" prefWidth="90.0" />
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nickname:" />
+               <TextField fx:id="unitNickname" prefHeight="26.0" prefWidth="58.0" />
+            </children>
+         </HBox>
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Many mm in your new unit:" />
+               <TextField fx:id="manyMmInNewUnit" />
+            </children>
+         </HBox>
+         <Button mnemonicParsing="false" onAction="#pressedAddUnit" styleClass="sidebar-button" text="Add Unit" />
+      </children>
+   </VBox>
+   <VBox styleClass="sidebar-vbox">
+      <children>
+         <Label styleClass="sidebar-subtitle" text="Unit in System:">
+         </Label>
+         <HBox alignment="TOP_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <ListView fx:id="unitsListView" prefHeight="130.0" prefWidth="180.0" />
+               <VBox alignment="TOP_CENTER" spacing="5.0" styleClass="sidebar-vbox">
+                  <children>
+                     <Button minWidth="35.0" mnemonicParsing="false" onAction="#moveUp" styleClass="sidebar-button" text="▲" />
+                     <Button minWidth="35.0" mnemonicParsing="false" onAction="#moveDown" styleClass="sidebar-button" text="▼" />
+                     <Button minWidth="35.0" mnemonicParsing="false" onAction="#removeItem" style="-fx-text-fill: red;" styleClass="sidebar-button" text="X" />
+                  </children>
+               </VBox>
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+    
+    <Separator />
+    
+    <HBox alignment="CENTER_RIGHT" styleClass="sidebar-hbox">
+        <Button onAction="#pressedCancel" styleClass="sidebar-button-cancel" text="Cancel" />
+
+		<Button onAction="#pressedSave" styleClass="sidebar-button-OK" text="Save" />
+    </HBox>
+
+</VBox>

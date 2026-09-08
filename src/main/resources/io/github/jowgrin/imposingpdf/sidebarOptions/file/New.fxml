@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.file.NewDocumentController">
+    
+    <Label styleClass="sidebar-title" text="New Documents" />
+    <Separator />
+    
+    <VBox styleClass="sidebar-vbox">
+      <Label styleClass="sidebar-subtitle" text="Total Pages:" />
+      <Spinner fx:id="amountPages" editable="true" initialValue="4" max="999" min="1" styleClass="sidebar-spinner" />
+    </VBox>
+    
+    <VBox styleClass="sidebar-vbox">
+      <GridPane styleClass="sidebar-gridPane">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="151.20001220703125" minWidth="10.0" prefWidth="139.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="107.20001220703126" minWidth="10.0" prefWidth="75.80000000000001" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints valignment="BOTTOM" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+              <Label styleClass="sidebar-subtitle" text="Page Size:" />
+            <ComboBox fx:id="pageSize" prefWidth="150.0" styleClass="sidebar-comboBox" GridPane.rowIndex="1" />
+            <Label styleClass="sidebar-subtitle" text="Orientation" GridPane.columnIndex="1" />
+            <ComboBox fx:id="directionPage" prefWidth="150.0" styleClass="sidebar-comboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+    </VBox>
+   <Separator prefWidth="200.0" />
+    
+    <VBox styleClass="sidebar-vbox">
+      <Label styleClass="sidebar-subtitle" text="More Elements:" />
+      <HBox styleClass="sidebar-hbox">
+         <children>
+            <Label minWidth="-Infinity" text="Background color:" />
+            <ColorPicker fx:id="backgroundPages" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+         <children>
+            <Label text="Frame:" />
+            <ComboBox fx:id="frames" styleClass="sidebar-comboBox" />
+         </children>
+      </HBox>
+      <CheckBox fx:id="numberPage" mnemonicParsing="false" selected="true" styleClass="sidebar-checkBox" text="Add number page" />
+    </VBox>
+    
+    <Separator />
+    
+    <HBox alignment="CENTER_RIGHT" styleClass="sidebar-hbox">
+        <Button onAction="#pressedCancel" styleClass="sidebar-button-cancel" text="Cancel" />
+
+		<Button onAction="#pressedCreate" styleClass="sidebar-button-OK" text="Create" />
+    </HBox>
+
+</VBox>

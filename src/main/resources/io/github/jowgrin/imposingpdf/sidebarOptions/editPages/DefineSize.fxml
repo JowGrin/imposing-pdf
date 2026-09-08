@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox prefWidth="250.0" styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.editPages.DefinePagesSizeController">
+    
+    <Label styleClass="sidebar-title" text="Dedine Pages Size " />
+    <Separator />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+           <Label styleClass="sidebar-subtitle" text="Choose File" />
+         <ComboBox fx:id="chooseFileComboBox" maxWidth="1.7976931348623157E308" onMouseClicked="#pressedChooseFile" promptText="Choose active file..." styleClass="sidebar-button" />
+      </children>
+   </VBox>
+   <Separator prefWidth="200.0" />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+         <Label styleClass="sidebar-subtitle" text="Choose Type Output:" />
+         <RadioButton fx:id="radioButtonFitPage" mnemonicParsing="false" selected="true" text="Fit to page">
+            <toggleGroup>
+               <ToggleGroup fx:id="optionPageFit" />
+            </toggleGroup>
+         </RadioButton>
+         <RadioButton fx:id="radioButtonCropAndPad" mnemonicParsing="false" text="Crop and Pad" toggleGroup="$optionPageFit" />
+      </children>
+   </VBox>
+   <Separator prefWidth="200.0" />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+         <Label styleClass="sidebar-subtitle" text="Choose Output Size:" />
+         <RadioButton fx:id="radioButtonKnownSize" mnemonicParsing="false" onAction="#pressedKnowSize" selected="true" text="Known size">
+            <toggleGroup>
+               <ToggleGroup fx:id="optionSize" />
+            </toggleGroup>
+         </RadioButton>
+         <HBox fx:id="hboxKnowSize" styleClass="sidebar-hbox">
+            <children>
+               <ComboBox fx:id="pageSize" prefHeight="26.0" prefWidth="150.0" styleClass="sidebar-comboBox" />
+               <ComboBox fx:id="orientatePage" minWidth="-Infinity" prefWidth="70.0" styleClass="sidebar-comboBox" />
+            </children>
+         </HBox>
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <RadioButton fx:id="radioButtonSpecificSize" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressedSpecificSize" prefHeight="18.0" prefWidth="74.0" text="Spesific:" toggleGroup="$optionSize" />
+               <HBox fx:id="hboxSpesificSize" alignment="CENTER_LEFT" styleClass="sidebar-hbox" visible="false">
+                  <children>
+                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="H" />
+                     <TextField fx:id="height" />
+                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="W" />
+                     <TextField fx:id="width" />
+                  </children>
+               </HBox>
+            </children>
+         </HBox>
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <RadioButton fx:id="radioButtonPercent" mnemonicParsing="false" onAction="#pressedPressent" text="Percents:" toggleGroup="$optionSize" />
+               <HBox fx:id="hboxPercent" styleClass="sidebar-hbox" visible="false">
+                  <children>
+                     <TextField fx:id="textFieldPercent" prefHeight="26.0" prefWidth="53.0" />
+                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="\%" />
+                  </children>
+               </HBox>
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+    
+    <Separator />
+    
+    <HBox alignment="CENTER_RIGHT" styleClass="sidebar-hbox">
+        <Button onAction="#pressedCancel" styleClass="sidebar-button-cancel" text="Cancel" />
+
+		<Button onAction="#pressedDefine" styleClass="sidebar-button-OK" text="Define" />
+    </HBox>
+
+</VBox>

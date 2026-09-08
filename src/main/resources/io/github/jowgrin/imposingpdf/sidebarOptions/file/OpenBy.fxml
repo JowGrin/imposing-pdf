@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.file.OpenDocumentsController">
+    
+    <Label styleClass="sidebar-title" text="Open Documents" />
+    <Separator />
+   <HBox styleClass="sidebar-hbox">
+      <children>
+         <Button mnemonicParsing="false" onAction="#pressedOpenLocalFile" styleClass="sidebar-button" text="Add Files" />
+         <Button mnemonicParsing="false" onAction="#pressedOpenLocalFolder" styleClass="sidebar-button" text="Add Folder" />
+      </children>
+   </HBox>
+    
+    <VBox styleClass="sidebar-vbox" />
+    
+    <VBox styleClass="sidebar-vbox">
+        <Label styleClass="sidebar-subtitle" text="Add URL:" />
+      <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+         <children>
+            <TextField fx:id="URLlink" prefHeight="26.0" prefWidth="142.0" promptText="http://" />
+            <Button mnemonicParsing="false" onAction="#pressedAddRemoteFile" styleClass="sidebar-button" text="Add" />
+            <Label fx:id="symbolStatusRemoteFile" text="🌐" />
+         </children>
+      </HBox>
+    </VBox>
+    
+    <VBox styleClass="sidebar-vbox">
+        <Label styleClass="sidebar-subtitle" text="Selected Files / Links:" />
+      <ListView fx:id="filesList" prefHeight="166.0" />
+      <HBox styleClass="sidebar-hbox">
+         <children>
+            <Button mnemonicParsing="false" onAction="#pressedRemoveFromList" styleClass="sidebar-button" text="Remove" />
+            <Button mnemonicParsing="false" onAction="#pressedClearList" styleClass="sidebar-button" text="Clear All" />
+         </children>
+      </HBox>
+    </VBox>
+    
+    <Separator />
+    
+    <HBox alignment="CENTER_RIGHT" styleClass="sidebar-hbox">
+        <Button onAction="#pressedCancel" styleClass="sidebar-button-cancel" text="Cancel" />
+
+		<Button onAction="#pressedOpen" styleClass="sidebar-button-OK" text="Open" />
+    </HBox>
+
+</VBox>

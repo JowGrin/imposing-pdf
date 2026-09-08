@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="500.0" prefWidth="1000.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.MainViewController">
+    
+    <top>
+        <MenuBar>
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem onAction="#pressedNew" text="New..." />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedOpen" text="Open" />
+                        <MenuItem onAction="#pressedOpenBy" text="Open by..." />
+                        <SeparatorMenuItem />
+                        <MenuItem onAction="#pressedSave" text="Save" />
+                        <MenuItem onAction="#pressedSaveAs" text="Save As..." />
+                        <SeparatorMenuItem />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedCloseAll" text="Close All" />
+                        <MenuItem onAction="#pressedExit" text="Exit" />
+                    </items>
+                </Menu>
+                <Menu text="Edit File">
+                    <items>
+                        <MenuItem onAction="#pressedMerge" text="Merge Files" />
+                        <MenuItem onAction="#pressedSplit" text="Split File" />
+                        <MenuItem onAction="#pressedExtract" text="Extract Pages" />
+                    </items>
+                </Menu>
+                <Menu text="Edit Pages">
+                    <items>
+                        <MenuItem onAction="#pressedNUP" text="N-Up Page" />
+                        <MenuItem onAction="#pressedStepAndRepeat" text="Step &amp; Repeat" />
+                        <MenuItem onAction="#pressedTrimAndShift" text="Trim and Shift" />
+                        <MenuItem onAction="#pressedMix" text="Mix Pages" />
+                        <MenuItem onAction="#pressedSplitPages" text="Split Pages" />
+                  <MenuItem mnemonicParsing="false" onAction="#PressedRotation" text="Rotation" />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedDefineSize" text="Define Size" />
+                    </items>
+                </Menu>
+                <Menu text="Professional">
+                    <items>
+                        <MenuItem onAction="#pressedBooklet" text="Booklet" />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedBuildProgram" text="Build Program" />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedPerformProgram" text="Perform Program" />
+                    </items>
+                </Menu>
+            <Menu text="Setting">
+               <items>
+                  <MenuItem onAction="#pressedPageSize" text="Page Size" />
+                  <MenuItem onAction="#pressedDefaultUnit" text="Default Unit" />
+                  <MenuItem mnemonicParsing="false" onAction="#pressedUserSetting" text="User Setting" />
+                  <MenuItem onAction="#pressedLanguage" text="Language" />
+               </items>
+            </Menu>
+                <Menu text="Help">
+                    <items>
+                        <MenuItem onAction="#pressedDocumentation" text="Documentation" />
+                        <MenuItem onAction="#pressedAbout" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+
+    <left>
+        <VBox prefWidth="270.0">
+            <children>
+            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+              <content>
+                <AnchorPane>
+                     <children>
+                        <VBox fx:id="sidebarContainer" layoutX="2.0" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <padding>
+                              <Insets bottom="20.0" left="6.0" right="6.0" top="20.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            </children>
+        </VBox>
+    </left>
+
+    <bottom>
+        <HBox fx:id="statusBar" alignment="CENTER_LEFT" prefHeight="25.0" styleClass="status-bar">
+            <Label text="Ready" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Label text="Units: " />
+         <Label fx:id="unitDefault" text="Milimeter(mm)" />
+        </HBox>
+    </bottom>
+   <center>
+        <TabPane fx:id="tabsPane" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

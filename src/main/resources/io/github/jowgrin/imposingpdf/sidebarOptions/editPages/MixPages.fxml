@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="250.0" styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.editPages.MixPagesController">
+    
+    <Label styleClass="sidebar-title" text="Mix Pages" />
+   <Separator />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+           <Label styleClass="sidebar-subtitle" text="Choose File" />
+         <ComboBox fx:id="chooseFileComboBox" maxWidth="1.7976931348623157E308" onMouseClicked="#pressedChooseFile" promptText="Choose active file..." styleClass="sidebar-button" />
+      </children>
+   </VBox>
+    <Separator />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+         <Label styleClass="sidebar-subtitle" text="Which Pages:" />
+         <RadioButton fx:id="allPagesButton" mnemonicParsing="false" onAction="#pressedAllPages" selected="true" text="All pages">
+            <toggleGroup>
+               <ToggleGroup fx:id="pagesGroup" />
+            </toggleGroup>
+         </RadioButton>
+         <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
+            <children>
+               <RadioButton fx:id="seriesOfButton" mnemonicParsing="false" onAction="#pressedSeriesOfButton" text="Series of:" toggleGroup="$pagesGroup" />
+               <Spinner fx:id="seriesOf" disable="true" editable="true" initialValue="4" max="999" min="1" styleClass="sidebar-spinner" />
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+   <Separator prefWidth="200.0" />
+   <VBox styleClass="sidebar-vbox">
+      <children>
+         <Label styleClass="sidebar-subtitle" text="Type Mix" />
+         <RadioButton fx:id="orderButton" mnemonicParsing="false" onAction="#pressedOrder" selected="true" text="Order:">
+            <toggleGroup>
+               <ToggleGroup fx:id="orederGroup" />
+            </toggleGroup>
+         </RadioButton>
+         <TextField fx:id="orderSeries" promptText="e.g. for series of 4: 1,4,3,2" styleClass="te">
+            <VBox.margin>
+               <Insets left="8.0" />
+            </VBox.margin></TextField>
+         <RadioButton fx:id="shuffleButton" mnemonicParsing="false" onAction="#pressedShuffle" text="Shuffle pages" toggleGroup="$orederGroup" />
+         <RadioButton fx:id="reverseButton" mnemonicParsing="false" onAction="#pressedReverse" text="Reverse pages" toggleGroup="$orederGroup" />
+      </children>
+   </VBox>
+    
+    <Separator />
+    
+    <HBox alignment="CENTER_RIGHT" styleClass="sidebar-hbox">
+        <Button onAction="#pressedCancel" styleClass="sidebar-button-cancel" text="Cancel" />
+
+		<Button onAction="#pressedMix" styleClass="sidebar-button-OK" text="Mix" />
+    </HBox>
+
+</VBox>
