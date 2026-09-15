@@ -35,3 +35,7 @@ A desktop PDF imposition and processing tool built with JavaFX and Apache PDFBox
    ```bash
    git clone [https://github.com/JowGrin/imposing-pdf.git](https://github.com/JowGrin/imposing-pdf.git)
    cd imposing-pdf
+
+
+## Download for Windows
+https://github.com/JowGrin/imposing-pdf/releases/download/v1.0.0/ImposingPDF_Setup.exe
