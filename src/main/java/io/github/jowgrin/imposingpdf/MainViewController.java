@@ -6,31 +6,32 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Window;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Optional;
 
 import io.github.jowgrin.imposingpdf.MainTabs.TabTemplateController;
 import io.github.jowgrin.imposingpdf.PDFServices.PdfService;
-import io.github.jowgrin.imposingpdf.environment.BuildArrayListOfSizePage;
-import io.github.jowgrin.imposingpdf.environment.BuildArrayListOfUnits;
+import io.github.jowgrin.imposingpdf.environment.OperatorsArray;
+import io.github.jowgrin.imposingpdf.environment.UserSetting;
 import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.environment.PDFFilesArray;
+import io.github.jowgrin.imposingpdf.environment.Pattern;
 import io.github.jowgrin.imposingpdf.environment.Unit;
+import io.github.jowgrin.imposingpdf.environment.Operator;
 import io.github.jowgrin.imposingpdf.sidebarOptions.ControlPanelController;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 import io.github.jowgrin.imposingpdf.sidebarOptions.editFile.*;
 import io.github.jowgrin.imposingpdf.sidebarOptions.editPages.*;
 import io.github.jowgrin.imposingpdf.sidebarOptions.file.*;
 import io.github.jowgrin.imposingpdf.sidebarOptions.professional.BookletController;
+import io.github.jowgrin.imposingpdf.sidebarOptions.professional.BuildProgramController;
 import io.github.jowgrin.imposingpdf.sidebarOptions.setting.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import javafx.scene.control.Label;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -44,39 +45,43 @@ public class MainViewController {
 	@FXML
 	private HBox statusBar;
 	
-//	@FXML
-//	private Tab tab;
-	
 	@FXML private Label sidebarPages;
 	@FXML private Label sidebarPageSize;
-
-	@FXML
-	private Label unitDefault;
+	
+	@FXML private Label statusProcessLabel;
+	@FXML private Label unitDefault;
 	
 	@FXML
 	private TabPane tabsPane;
 	private TabTemplateController tabTemplateController;
     
-	// 
-	public static ObservableList<PDFFile> filesArr; // array that hold the open files
-    public static BuildArrayListOfSizePage sizesArrayList; // Object of saved sizes
-    public static BuildArrayListOfUnits unitsArrayList; // Object of saved units
+	public static UserSetting userSetting;
+	
+    public static PDFFilesArray pdfFilesArray; // object that hold the open files
+    public static OperatorsArray operatorsArrayList;
     
-    private final String sidebarsPathBase = "sidebarOptions/"; 
+//    public static File recentlyPath = new File(".");
+    
+    private final String SIDEBAR_PAEH_BASE = "sidebarOptions/"; 
     
     @FXML
     void initialize() {
-    	filesArr = FXCollections.observableArrayList();
+    	try {
+        	userSetting = new UserSetting();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	pdfFilesArray = new PDFFilesArray(FXCollections.observableArrayList());
     	initialSidebar();
-    	defineUserPreferences();
-    	defineTabSidebar();
+//    	defineUserPreferences();
     }
     
     
     // File:
     @FXML
     void pressedNew(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "file/New.fxml", new NewDocumentController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "file/New.fxml", new NewDocumentController());
     }
 
     @FXML
@@ -86,7 +91,7 @@ public class MainViewController {
     
     @FXML
     void pressedOpenBy(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "file/OpenBy.fxml", new OpenDocumentsController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "file/OpenBy.fxml", new OpenDocumentsController());
     }
     
     @FXML
@@ -97,7 +102,7 @@ public class MainViewController {
     
     @FXML
     void pressedSaveAs(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "file/SaveAs.fxml", new SaveAsDocumentsController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "file/SaveAs.fxml", new SaveAsDocumentsController());
     }
     
     @FXML
@@ -116,17 +121,17 @@ public class MainViewController {
     // Edit File
     @FXML
     void pressedMerge(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editFile/Merge.fxml", new MergeFilesController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editFile/Merge.fxml", new MergeFilesController());
     }
     
     @FXML
     void pressedSplit(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editFile/Split.fxml", new SplitFileController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editFile/Split.fxml", new SplitFileController());
     }
   
     @FXML
     void pressedExtract(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editFile/Extract.fxml", new ExtractFileController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editFile/Extract.fxml", new ExtractFileController());
     }
 
     
@@ -134,49 +139,49 @@ public class MainViewController {
     
     @FXML
     void pressedNUP(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/N-up.fxml", new NUPController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/N-up.fxml", new NUPController());
     }
 
     @FXML
     void pressedStepAndRepeat(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/Step&Repeat.fxml", new StepAndRepeatController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/Step&Repeat.fxml", new StepAndRepeatController());
     }
     
     @FXML
     void pressedTrimAndShift(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/Trim&Shift.fxml", new TrimAndShiftController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/Trim&Shift.fxml", new TrimAndShiftController());
     }
     
     @FXML
     void pressedMix(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/MixPages.fxml", new MixPagesController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/MixPages.fxml", new MixPagesController());
     }
     
     @FXML
     void PressedRotation(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/Rotation.fxml", new RotationPagesController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/Rotation.fxml", new RotationPagesController());
     }
     
     @FXML
     void pressedDefineSize(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/DefineSize.fxml", new DefinePagesSizeController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/DefineSize.fxml", new DefinePagesSizeController());
     }
     
     @FXML
     void pressedSplitPages(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "editPages/SplitPages.fxml", new SplitPagesController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "editPages/SplitPages.fxml", new SplitPagesController());
     }
    
     // Professional
 
     @FXML
     void pressedBooklet(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "professional//Booklet.fxml", new BookletController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "professional/Booklet.fxml", new BookletController());
     }
     
     @FXML
     void pressedBuildProgram(ActionEvent event) {
-
+    	showSidebar(SIDEBAR_PAEH_BASE + "professional/BuildProgram.fxml", new BuildProgramController());
     }
 
     @FXML
@@ -187,12 +192,12 @@ public class MainViewController {
     // Setting
     @FXML
     void pressedPageSize(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "setting/PageSize.fxml", new PageSizeSettingController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "setting/PageSize.fxml", new PageSizeSettingController());
     }
     
     @FXML
     void pressedDefaultUnit(ActionEvent event) {
-    	showSidebar(sidebarsPathBase + "setting/DefineUnit.fxml", new DefineUnitSettingController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "setting/DefineUnit.fxml", new DefineUnitSettingController());
     }
     
     @FXML
@@ -232,7 +237,7 @@ public class MainViewController {
     }
     
     public Unit getDefaultUnit() {
-    	return unitsArrayList.getSizesArrayList().get(0);
+    	return userSetting.getUnits().getDefaultUnit();
     }
     
     public void updateDefaultUnit() {
@@ -240,11 +245,15 @@ public class MainViewController {
     }
     
     public Unit[] getUnitsName() {
-    	return unitsArrayList.getUnits();
+    	return userSetting.getUnits().getUnits();
     }    
     
+    public Operator[] getOperators() {
+    	return operatorsArrayList.getOperators();
+    }
+    
     public void initialSidebar() {
-    	showSidebar(sidebarsPathBase + "ControlPanel.fxml", new ControlPanelController());
+    	showSidebar(SIDEBAR_PAEH_BASE + "ControlPanel.fxml", new ControlPanelController());
     }
 
     private void showSidebar(String fileName, SubController controller) {
@@ -262,44 +271,31 @@ public class MainViewController {
         }
     }
     
-   private void openDialog() {
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setTitle("select a file"); 
-    	fileChooser.setInitialDirectory(new File("."));
-    	fileChooser.getExtensionFilters().addAll(
-    	         new ExtensionFilter("PDF Files", "*.pdf"));
-    	         
-    	File file = fileChooser.showOpenDialog(this.getSidebarContainer().getScene().getWindow());
+    public Window getWindow() {
+    	return this.getSidebarContainer().getScene().getWindow()	;
+    }
+    
+    private void openDialog() {  
     	try {
-    		openFile(new PDFFile(file, true));
+    		PDFFilesArray files = PDFFilesArray.openDialog(getWindow(), userSetting);
+
+    		if (files != null)
+	    		for (PDFFile file : files)
+	    			openFile(file);
     	}catch(IOException e) {
     		e.printStackTrace();
     	}
     }
     
-    public File saveDialog(PDFFile pdfFile) {
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setTitle("Save a file"); 
-    	fileChooser.setInitialDirectory(new File("."));
-    	fileChooser.setInitialFileName(pdfFile.getName());
-    	fileChooser.getExtensionFilters().addAll(
-    	         new ExtensionFilter("PDF Files", "*.pdf"));
-    	         
-    	File file = fileChooser.showSaveDialog(this.getSidebarContainer().getScene().getWindow());
-    	
-    	if (file != null) {
-    	    try {
-    	    	pdfFile.getFile().save(file);
-    	    	pdfFile.setSaved(true);
-    	        System.out.println("The file saved seccessfully" + file.getAbsolutePath());
-    	    } catch (IOException e) {
-    	        System.err.println("Erorr to save file: " + e.getMessage());
-    	    }
-    	}
-    	return file;
+    public void updateRecenltyPathOpen(File path) {
+    	userSetting.updateRecentlyPath(path);
     }
     
-    public File saveDialog(String name) {
+    public boolean saveDialog(PDFFile pdfFile) {
+    	return pdfFile.saveDialog(getWindow(), userSetting.getRecentlyPathOpen());
+    }
+    
+    public boolean saveDialog(String name) {
     	return saveDialog(getPDFFile(name));
     }
     
@@ -309,25 +305,11 @@ public class MainViewController {
         	tabsPane.getTabs().remove(getTab(file));
     	}
     	
-    	// Remove from the array
-    	for (PDFFile file: files) {
-    		// Close the PDFFile
-        	try {
-        		file.close();
-        	} catch(IOException e) {
-        		e.printStackTrace();
-        	} 	
-    		filesArr.remove(file);
-    	}    	
+    	pdfFilesArray.closeFiles(files);	
     }
     
     public void closeFiles(String... files) {
-    	PDFFile[] pdfFile = new PDFFile[files.length];
-    	
-    	for (int i = 0; i < files.length; i++) {
-    		pdfFile[i] = getPDFFile(files[i]);
-    	}
-    	closeFiles(pdfFile);
+    	closeFiles(pdfFilesArray.toPDFFileArray(files));
     }
     
     private Tab getTab(PDFFile file) {
@@ -339,25 +321,26 @@ public class MainViewController {
     }
     
     private boolean closeAllDialog(ActionEvent event) {
-    	ButtonType btnExit = new ButtonType("Close All (don't save)", ButtonBar.ButtonData.YES);
-        ButtonType btnCancel = new ButtonType("Cancel (don't close)", ButtonBar.ButtonData.CANCEL_CLOSE);
-        
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Close All");
-        alert.setHeaderText("Close all the PDF's file");
-        alert.setContentText("Do you sure you want to close everything without saving?");
-        
-        alert.getButtonTypes().setAll(btnCancel, btnExit);
-        
-        Optional<ButtonType> result = alert.showAndWait();
-        
-        if (result.isPresent() && result.get() == btnExit) {
-        	PDFFile[] files = new PDFFile[filesArr.size()];
-        	filesArr.toArray(files);
-        	closeFiles(files);
-        	return true;
-        }
-        return false;
+    	if (pdfFilesArray.hasUnsaved()) {
+    		ButtonType btnExit = new ButtonType("Close All (don't save)", ButtonBar.ButtonData.YES);
+            ButtonType btnCancel = new ButtonType("Cancel (don't close)", ButtonBar.ButtonData.CANCEL_CLOSE);
+            
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Close All");
+            alert.setHeaderText("Close all the PDF's file");
+            alert.setContentText("Do you sure you want to close everything without saving?");
+            
+            alert.getButtonTypes().setAll(btnCancel, btnExit);
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            
+            if (!result.isPresent() || !(result.get() == btnExit)) {
+            	return false;
+            }
+    	}
+    	
+    	closeFiles(pdfFilesArray.toArray());
+    	return true;
     }    
     
     public void openFile(PDFFile file) {
@@ -366,30 +349,21 @@ public class MainViewController {
     	}
     	
     	if (file.getName() == null)
-        	file.setName("Untitled" + (tabsPane.getTabs().size() + 1));
+        	file.setName("Untitled.pdf");
     	
     	int i = 1;
-    	while (existNameInFilesArr(file.getName())) {
-    		file.setName(i + "_" + file.getName());
+    	while (pdfFilesArray.hasName(file.getName())) {
+    		file.setName(Pattern.getNextName(file.getName(), i));
     		i++;
     	}
     	
     	defineTab(file.getName());
         
     	// add to array
-        filesArr.add(file);
+        pdfFilesArray.add(file);
         
         // Add tab with the file
         PdfService.addFileInVBox(tabTemplateController.getVBox(), file.getFile());
-    }
-    
-    
-    private boolean existNameInFilesArr(String name) {
-    	for (PDFFile file: filesArr) {
-    		if (file.getName().equals(name))
-    			return true;
-    	}
-    	return false;
     }
     
     private void defineTab(String name){
@@ -415,7 +389,11 @@ public class MainViewController {
      * @return the selected file
      */
     public PDFFile getSelectedPDFFile() {
-    	return getPDFFile(tabsPane.getSelectionModel().getSelectedItem().getText());
+    	Tab tab = tabsPane.getSelectionModel().getSelectedItem();
+    	if (tab == null) {
+    		throw new NullPointerException("is no file open");
+    	}
+    	return getPDFFile(tab.getText());
     }
     
     /**
@@ -424,15 +402,11 @@ public class MainViewController {
      * @return the file
      */
     public PDFFile getPDFFile(String name) {
-    	if (name == "" || name == null) {
+    	PDFFile file = pdfFilesArray.getPDFFile(name);
+    	if (file == null)
     		return getSelectedPDFFile();
-    	}
-    	for(PDFFile pf: filesArr) {
-    		if (pf.getName().equals(name)) {
-    			return pf;
-    		}
-    	}
-    	return filesArr.get(0);
+    	else
+    		return file;
     }
     
     /**
@@ -442,43 +416,41 @@ public class MainViewController {
      */
     public PDFFile getPDFFile(Tab tab) {
     	if (tab == null) {
-    		return getSelectedPDFFile();
+        	return getSelectedPDFFile();
     	}
     	else {
     		return getPDFFile(tab.getText());
     	}
     }
     
-    private void defineUserPreferences() {
-    	updateSizesArray();
-    	updateUnitsArray();
-    	updateDefaultUnit();
-    }
-    
-    public void updateSizesArray() {
-    	try {
-    		ObjectInputStream input = new ObjectInputStream(new FileInputStream("SizesArrayList.dll"));
-    		sizesArrayList = (BuildArrayListOfSizePage)input.readObject();
-    		input.close();
-    	} catch(IOException | ClassNotFoundException e) {
-    		e.printStackTrace();
+    public static enum StatusLabel{READY, PROCESSING, FINISH, FAILURE}
+    public void changeStatusLabel(StatusLabel state, String message) {
+    	String text = "";
+    	switch (state) {
+		case READY:
+			statusProcessLabel.setTextFill(Color.BLACK);
+			text = "ready.";
+			break;
+		case PROCESSING:
+			statusProcessLabel.setTextFill(Color.BLACK);
+			text = "processing...";
+			break;
+		case FINISH:{
+			statusProcessLabel.setTextFill(Color.GREEN);
+			text = "finish successefully";
+			break;
+		}
+		case FAILURE:{
+			statusProcessLabel.setTextFill(Color.RED);
+			text = "Error:";
+			break;
+		}
     	}
-    }
-    
-    public void updateUnitsArray() {
-    	try {
-    		ObjectInputStream input = new ObjectInputStream(new FileInputStream("UnitsArrayList.dll"));
-    		unitsArrayList = (BuildArrayListOfUnits)input.readObject();
-    		input.close();
-    	} catch(IOException | ClassNotFoundException e) {
-    		e.printStackTrace();
+    	if (message != null) {
+    		text += " " + message;
     	}
+	    statusProcessLabel.setText(text);
     }
-        
-	private void defineTabSidebar(){
-//		sidebarPages.setText("");
-//		sidebarPageSize.setText("");
-	}
 }
 
 

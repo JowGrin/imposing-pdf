@@ -35,7 +35,7 @@
       <children>
          <Label minHeight="-Infinity" minWidth="-Infinity" styleClass="sidebar-subtitle" text="File to Split:">
          </Label>
-         <Text fx:id="nameFileText" fill="#0ec448" strokeType="OUTSIDE" strokeWidth="0.0" text="no file choosed" />
+         <Text fx:id="fileNameText" fill="#0ec448" strokeType="OUTSIDE" strokeWidth="0.0" text="no file choosed" />
       </children>
    </HBox>
    <VBox styleClass="sidebar-vbox">

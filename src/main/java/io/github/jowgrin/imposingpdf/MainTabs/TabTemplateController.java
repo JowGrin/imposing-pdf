@@ -61,7 +61,7 @@ public class TabTemplateController {
         if (result.isPresent()) {
             if (result.get() == btnSave) {
                 // המשתמש לחץ על "שמור"
-                if (mainController.saveDialog(((Tab)(event.getSource())).getText()) != null) {
+                if (mainController.saveDialog(((Tab)(event.getSource())).getText())) {
                 	mainController.closeFiles(((Tab)(event.getSource())).getText());
                 }
                 else

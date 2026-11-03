@@ -1,23 +1,22 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.professional;
 
-import java.io.IOException;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
-import io.github.jowgrin.imposingpdf.PDFServices.NUpDocument;
-import io.github.jowgrin.imposingpdf.PDFServices.NewedDocument;
-import io.github.jowgrin.imposingpdf.environment.PDFFile;
-import io.github.jowgrin.imposingpdf.environment.PageSize;
-import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 
-public class BookletController extends SubController {
+import org.apache.pdfbox.pdmodel.PDDocument;
+
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
+import io.github.jowgrin.imposingpdf.PDFServices.NUpDocument;
+import io.github.jowgrin.imposingpdf.PDFServices.NewedDocument;
+import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.environment.PageSize;
+import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
+
+
+public class BookletController extends SubController{
 
     @FXML
     private ComboBox<String> typeLanguage;
@@ -25,31 +24,28 @@ public class BookletController extends SubController {
     @FXML
     private ComboBox<Tab> chooseFileComboBox;
     
-    private static final String LTR = "LTR (English)";
-    private static final String RTL = "RTL (Hebrew)";
-    
     @FXML
     void initialize() {
-    	typeLanguage.setItems(FXCollections.observableArrayList(LTR, RTL));
-    	typeLanguage.getSelectionModel().selectFirst();
+    	showLanguage(typeLanguage);
     }
     
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());    	
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
     }
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedCreate(ActionEvent event) {
     	try {
-    		int amountPages = getSelectedPDFFile(chooseFileComboBox).getFile().getNumberOfPages();
+    		PDFFile selectedFile = getSelectedPDFFile(chooseFileComboBox);
+			updateStateLabel(StatusLabel.PROCESSING, "Creating booklet " + selectedFile.getName());
+
+			int amountPages = selectedFile.getFile().getNumberOfPages();
     		if (amountPages % 4 != 0)
     			NewedDocument.addPages(getSelectedPDFFile(chooseFileComboBox).getFile(), 4 - (amountPages % 4), new PageSize(29.7,21) , false);
 			amountPages = getSelectedPDFFile(chooseFileComboBox).getFile().getNumberOfPages();
@@ -57,7 +53,7 @@ public class BookletController extends SubController {
     		PDDocument pd = new PDDocument();
     		
     		int language;
-    		if (isEnglish())
+    		if (isEnglish(typeLanguage))
     			language = 1;
     		else
     			language = 0;
@@ -80,32 +76,12 @@ public class BookletController extends SubController {
         		pd.addPage(nd.create().getPage(0));
     		}
     		
-    		
-    		
-//    		Unit unit = getMainController().getDefaultUnit();
-//    		NUpDocument nd = new NUpDocument(getSelectedPDFFile().getFile());
-//    		nd.setCols(2);
-//    		nd.setRows(1);
-//    		nd.setOuterMargin(unit.convertToPoints(Double.valueOf(outerMargin.getText())));
-//    		nd.setInnerMargin(unit.convertToPoints(Double.valueOf(innerMargin.getText())));
-//    		nd.setTargetPageSize(getTagetPageSize());
-//    		nd.setLandscape(isLandscape());
-//    		nd.setKeepOriginalScale(keepOrginalScale.isSelected());
-//    		nd.setAddCropMarks(drawBordersAround.isSelected());
-    	
-    		
-    		
-    		getMainController().openFile(new PDFFile("Booklet-" + getSelectedPDFFile(chooseFileComboBox).getName(), pd));
-    	} catch(IOException e) {
+    		openFile(new PDFFile("Booklet-" + getSelectedPDFFile(chooseFileComboBox).getName(), pd));
+			updateStateLabel(StatusLabel.FINISH, "Created booklet " + selectedFile.getName());
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     		e.printStackTrace();
     	}    
-    }
-    
-    private boolean isEnglish() {
-    	if (typeLanguage.getSelectionModel().getSelectedItem().equals(LTR))
-    		return true;
-    	return false;
-    }
-    
+    }    
 
 }

@@ -1,12 +1,7 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.editPages;
 
-import java.io.IOException;
+import java.io.Serializable;
 
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
-import io.github.jowgrin.imposingpdf.PDFServices.MixedDocument;
-import io.github.jowgrin.imposingpdf.PDFServices.MixedDocument.TypeOrder;
-import io.github.jowgrin.imposingpdf.environment.PDFFile;
-import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -17,9 +12,21 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.RadioButton;
 
-public class MixPagesController extends SubController{
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
+import io.github.jowgrin.imposingpdf.PDFServices.MixedDocument;
+import io.github.jowgrin.imposingpdf.PDFServices.MixedDocument.TypeOrder;
+import io.github.jowgrin.imposingpdf.environment.Operator;
+import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 
-    @FXML
+public class MixPagesController extends SubController implements Operator, Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@FXML
     private ComboBox<Tab> chooseFileComboBox;
     
     @FXML
@@ -44,9 +51,7 @@ public class MixPagesController extends SubController{
     
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());    	
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
     }
     
     @FXML
@@ -77,13 +82,16 @@ public class MixPagesController extends SubController{
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedMix(ActionEvent event) {
     	try {
-	    	MixedDocument md = new MixedDocument(getSelectedPDFFile(chooseFileComboBox).getFile());
+    		PDFFile selectedFile = getSelectedPDFFile(chooseFileComboBox);
+    		updateStateLabel(StatusLabel.PROCESSING, "Mixing " + selectedFile.getName());
+
+	    	MixedDocument md = new MixedDocument(selectedFile.getFile());
 	    	if (allPagesButton.isSelected())
 		    	md.setSeriesOf(getSelectedPDFFile(chooseFileComboBox).getFile().getNumberOfPages());
 	    	else
@@ -101,10 +109,16 @@ public class MixPagesController extends SubController{
 	    		md.setTypeOrder(TypeOrder.REVERSE);
 	    	}
 	    	
-			getMainController().openFile(new PDFFile("Mixed-" + getSelectedPDFFile(chooseFileComboBox).getName(), md.create()));
-    	} catch(IOException e) {
-    		e.printStackTrace();
+			openFile(new PDFFile("Mixed-" + getSelectedPDFFile(chooseFileComboBox).getName(), md.create()));
+    		updateStateLabel(StatusLabel.FINISH, "Mixed " + selectedFile.getName());
+
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	}
+    }
+    
+    public String toString() {
+    	return "Mix Pages";
     }
 
 }

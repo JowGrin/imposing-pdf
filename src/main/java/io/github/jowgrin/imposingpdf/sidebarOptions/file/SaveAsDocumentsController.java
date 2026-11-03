@@ -1,21 +1,23 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.file;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.io.File;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.stage.DirectoryChooser;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Tab;
 
-import java.io.File;
-import java.io.IOException;
-
-import io.github.jowgrin.imposingpdf.MainViewController;
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
 import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.environment.PDFFilesArray;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
+import io.github.jowgrin.imposingpdf.environment.Pattern;
+
 
 public class SaveAsDocumentsController extends SubController{
 
@@ -24,6 +26,10 @@ public class SaveAsDocumentsController extends SubController{
 
     @FXML
     private TextField folderName;
+    
+    @FXML
+    private ComboBox<Tab> chooseFileComboBox;
+
 
     @FXML
     private HBox hboxChangeNames;
@@ -33,19 +39,29 @@ public class SaveAsDocumentsController extends SubController{
 
     @FXML
     private TextField patternFilesNameTextField;
-    private ObservableList<PDFFile> filesNameArr;
+    private PDFFilesArray filesNameArr;
     private File dir;
     
     @FXML
     void initialize() {
-    	filesNameArr = FXCollections.observableArrayList(getFilesArr());
-    	filesList.setItems(filesNameArr);
+    	filesNameArr = new PDFFilesArray();
+    	filesList.setItems(filesNameArr.getArray());
     } 
+    
+    @FXML
+    void pressedChooseFile(MouseEvent event) {
+    	showActiveFile(chooseFileComboBox);
+    }
+    
+    @FXML
+    void pressedChoose(ActionEvent event) {
+    	filesNameArr.add(getSelectedPDFFile(chooseFileComboBox));
+    }
     
     @FXML
     void pressedSelectAll(ActionEvent event) {
     	filesNameArr.clear();
-    	filesNameArr.addAll(filesNameArr);
+    	filesNameArr.add(getPdfFileArray());
     }
 
     @FXML
@@ -60,10 +76,7 @@ public class SaveAsDocumentsController extends SubController{
     
     @FXML
     void pressedOpenLocalFolder(ActionEvent event) {
-    	DirectoryChooser directory = new DirectoryChooser();
-    	directory.setTitle("Select Folder");
-    	directory.setInitialDirectory(new File("."));
-    	dir = directory.showDialog(getMainController().getSidebarContainer().getScene().getWindow());
+    	dir = openFolderDialog();
     	
     	if (dir != null) {
     		folderName.setText(dir.getName());
@@ -82,62 +95,47 @@ public class SaveAsDocumentsController extends SubController{
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
     
     @FXML
     void pressedSave(ActionEvent event) {
 		String fileName = null;
 		String pattern = null;
-		
-		if (isPattern(patternFilesNameTextField.getText()))
-			pattern = ConvertToFormat(patternFilesNameTextField.getText());
-		else
-			checkboxChangeName.setSelected(false);
+		try {
+			updateStateLabel(StatusLabel.PROCESSING, "Saveing files ");
+			// if the user send correct pattern
 			
-    	for (int i = 0; i < filesNameArr.size(); i++) {
-    		try {
-    			if (checkboxChangeName.isSelected()) {
-        			fileName = String.format(pattern, i + 1);
-        		}
-    			else {
-    				fileName = filesNameArr.get(i).getName();
-    			}
-    			
-    			File file = new File(dir.getPath() + "\\" + fileName + ".pdf");
-    			filesNameArr.get(i).getFile().save(file);
-    			System.out.println("The file: " + dir.getPath() + "\\" + fileName + ".pdf" + " saved secessefully!");
-    		} catch(IOException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    	
-    	if (closeAfterSaving.isSelected())
-    		closeChoosen();
-    	getMainController().initialSidebar();
-    	
+			if (dir == null)
+				throw new IllegalArgumentException("The output folder is empty");
+			
+			if (Pattern.isPattern(patternFilesNameTextField.getText()))
+				pattern = Pattern.ConvertToFormat(patternFilesNameTextField.getText());
+			else
+				checkboxChangeName.setSelected(false);
+			
+			
+	    	for (int i = 0; i < filesNameArr.size(); i++) {	
+	    			if (checkboxChangeName.isSelected()) {
+	        			fileName = String.format(pattern, i + 1) + ".pdf";
+	        		}
+	    			else {
+	    				fileName = filesNameArr.get(i).getName();
+	    			}
+	    			
+	    			File file = new File(dir.getPath() + "\\" + fileName);
+	    			filesNameArr.get(i).getFile().save(file);
+	    			System.out.println("The file: " + dir.getPath() + "\\" + fileName + " saved secessefully!");
+	    	}
+	    	
+	    	if (closeAfterSaving.isSelected()) {
+	    		closeFile(filesNameArr.toArray());
+	    	}
+	    	
+			updateStateLabel(StatusLabel.FINISH, "Saved files ");
+		} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+    		e.printStackTrace();
+		}
     }
-    
-    private void closeChoosen() {
-    	for (PDFFile file: filesNameArr) {
-    		getMainController().closeFiles(file);
-    	}
-    }
-    
-    	
-    private boolean isPattern(String pattern) {
-    	if (pattern == null)
-			return false;
-    	if (pattern.contains("{n}"))
-    		return true;
-    	return false;
-    }
-    
-    
-    private String ConvertToFormat(String pattren) {
-		pattren = pattren.replace('{', ',');
-		pattren = pattren.replace('}', ',');
-    	return pattren.replaceAll(",n,", "%d");
-	}
-
 }

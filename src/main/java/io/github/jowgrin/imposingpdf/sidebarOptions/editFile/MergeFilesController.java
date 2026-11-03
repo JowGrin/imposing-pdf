@@ -1,25 +1,20 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.editFile;
 
-import javafx.collections.FXCollections;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.MultipleSelectionModel;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tab;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
 import io.github.jowgrin.imposingpdf.PDFServices.MergedDocument;
 import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.environment.PDFFilesArray;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -34,60 +29,53 @@ public class MergeFilesController extends SubController{
     
     @FXML
     private ListView<PDFFile> mergeFilesListView;
-    private ObservableList<PDFFile> filesName;
+    private PDFFilesArray filesName;
+    
     
     @FXML
     void initialize() {
-    	filesName = FXCollections.observableArrayList();
-    	mergeFilesListView.setItems(filesName);
+    	filesName = new PDFFilesArray();
+    	mergeFilesListView.setItems(filesName.getArray());
     	
     }
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
+
     }
 
     @FXML
     void pressedChoose(ActionEvent event) {
-    	filesName.add(getMainController().getPDFFile(chooseFileComboBox.getSelectionModel().getSelectedItem()));
+    	try {
+    		filesName.add(getSelectedPDFFile(chooseFileComboBox));
+    	} catch(NullPointerException e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+    	}
     }
     
     @FXML
     void pressedOpenLocalFile(ActionEvent event) {
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setTitle("select a file"); 
-    	fileChooser.setInitialDirectory(new File("."));
-    	fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF Files", "*.pdf"));
-    	         
-    	 List<File> selectedFiles = fileChooser.showOpenMultipleDialog(getMainController().getSidebarContainer().getScene().getWindow());
-    	 if (selectedFiles != null) {
-    		updateList(selectedFiles);    		 
+    	 try {
+    		 PDFFilesArray files = openDialogMulti();
+    		 filesName.add(files.toArray());
+    	 } catch(IOException e) {
+     		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	 }
+    	 
     }
     
     @FXML
     void moveDown(ActionEvent event) {
     	int index = mergeFilesListView.getSelectionModel().getSelectedIndex();
     	moveSelect(index+1);
-    	replace(index, index+1);
+    	filesName.replace(index, index+1);
     }
 
     @FXML
     void moveUp(ActionEvent event) {
     	int index = mergeFilesListView.getSelectionModel().getSelectedIndex();
     	moveSelect(index-1);
-    	replace(index, index-1);
-    }  
-    
-    private void replace(int i, int j) {
-    	int size = filesName.size();
-    	if (i < 0 || i >= size || j < 0 || j >= size)
-    		return;
-    	PDFFile temp = filesName.get(j);
-    	filesName.set(j, filesName.get(i));
-    	filesName.set(i, temp);
+    	filesName.replace(index, index-1);
     }
     
     private void moveSelect(int index) {
@@ -105,31 +93,29 @@ public class MergeFilesController extends SubController{
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedMerge(ActionEvent event) {
-    	MergedDocument md = new MergedDocument(getDocuments());
-    	
-    	if (reorderCheckBox.isSelected())
-    		md.setIsReorder(true);
-    	
-    	getMainController().openFile(new PDFFile("Merged-" + filesName.get(0).getName(), md.create()));
+		updateStateLabel(StatusLabel.PROCESSING, "margeing files");
+
+		try {
+	    	MergedDocument md = new MergedDocument(getDocuments());
+	    	
+	    	if (reorderCheckBox.isSelected())
+	    		md.setIsReorder(true);
+	    	
+	    	openFile(new PDFFile("Merged-" + filesName.get(0).getName(), md.create()));
+			updateStateLabel(StatusLabel.FINISH, "marged files");
+
+		} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+		}
+
     }
     
     private PDDocument[] getDocuments() {
-    	return filesName.stream().map(PDFFile::getFile).toArray(PDDocument[]::new);
+    	return filesName.getArray().stream().map(PDFFile::getFile).toArray(PDDocument[]::new);
     }
-    
-    private void updateList(List<File> list) {
-    	for(File file: list) {
-    		try{
-    			filesName.add(new PDFFile(file, true));
-    		}catch(IOException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    }
-    
 }

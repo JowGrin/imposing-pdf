@@ -35,6 +35,11 @@ public class PageSize implements Serializable{
 	public PageSize(double height, double width) {
 		this("size" + Math.random()*50, height, width);
 	}
+	
+	public PageSize(double height, double width, Unit unit) {
+		this("size" + Math.random()*50, height, width, unit);
+	}
+	
 
 	public double getWidth() {
 		return width;

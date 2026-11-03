@@ -2,23 +2,19 @@ package io.github.jowgrin.imposingpdf.sidebarOptions.editFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
-import io.github.jowgrin.imposingpdf.PDFServices.ExtractedDocument;
-import io.github.jowgrin.imposingpdf.environment.PDFFile;
-import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.Tab;
 
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
+import io.github.jowgrin.imposingpdf.PDFServices.ExtractedDocument;
+import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 
 public class ExtractFileController extends SubController{
 
@@ -34,6 +30,9 @@ public class ExtractFileController extends SubController{
     @FXML
     private TextField patternFilesNameTextField;
     private File dir;
+    private PDFFile selectedFile;
+    private final String DEFAULT_FILENAME = "no file choosed";
+
     
     @FXML
     void initialize() {
@@ -42,37 +41,35 @@ public class ExtractFileController extends SubController{
     
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
     }
     
     @FXML
     void choosedActiveFile(ActionEvent event) {
-    	fileNameText.setText(chooseFileComboBox.getSelectionModel().getSelectedItem().getText());
+    	try {
+    		fileNameText.setText(chooseFileComboBox.getSelectionModel().getSelectedItem().getText());
+    	} catch(NullPointerException e) {
+    		fileNameText.setText(DEFAULT_FILENAME);
+    	} finally {
+    		selectedFile = null;
+		}
     }
     
     @FXML
     void pressedOpenLocalFile(ActionEvent event) {
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setTitle("select a file"); 
-    	fileChooser.setInitialDirectory(new File("."));
-    	fileChooser.getExtensionFilters().addAll(
-    	         new ExtensionFilter("PDF Files", "*.pdf"));
-    	         
-    	 File selectedFile = fileChooser.showOpenDialog(getMainController().getSidebarContainer().getScene().getWindow());
-    	 if (selectedFile != null) {
-    		 fileNameText.setText(selectedFile.getName());
-    	 }
+    	try {
+    		selectedFile = openDialog();
+    		if (selectedFile != null) {
+    			fileNameText.setText(selectedFile.getName());
+       	 }
+    	} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     @FXML
     void pressedOpenLocalFolder(ActionEvent event) {
-    	DirectoryChooser directory = new DirectoryChooser();
-    	directory.setTitle("Select Folder");
-    	directory.setInitialDirectory(new File("."));
-    	dir = directory.showDialog(getMainController().getSidebarContainer().getScene().getWindow());
-    	
+    	dir = openFolderDialog();	
     	if (dir != null) {
     		folderNameTextField.setText(dir.getName());
     	}
@@ -80,24 +77,30 @@ public class ExtractFileController extends SubController{
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedExtact(ActionEvent event) {
-    	ExtractedDocument ed = new ExtractedDocument(getSelectedDocument().getFile());
-    	ed.setPattern(patternFilesNameTextField.getText());
-    	ed.setOutputDirectory(dir);
     	try{
+    		updateStateLabel(StatusLabel.PROCESSING, "extracting " + getSelectedPDFFile().getName());
+    		ExtractedDocument ed = new ExtractedDocument(getSelectedPDFFile().getFile());
+        	ed.setPattern(patternFilesNameTextField.getText());
+        	ed.setOutputDirectory(dir);
     		ed.save();
-        	getMainController().initialSidebar();
-    	} catch(IOException e) {
-    		e.printStackTrace();
+    		updateStateLabel(StatusLabel.FINISH, "extracted " + getSelectedPDFFile().getName());
+
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	}
     }
     
-    private PDFFile getSelectedDocument() {
-    	return getMainController().getPDFFile(fileNameText.getText());
+    private PDFFile getSelectedPDFFile() throws IOException {
+    	if (fileNameText.getText().equals(DEFAULT_FILENAME) || selectedFile == null) {
+    		return getSelectedPDFFile(chooseFileComboBox);
+    	}
+    	else
+    		return selectedFile;
     }
 
 }

@@ -1,8 +1,7 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.editFile;
-import java.io.File;
 import java.io.IOException;
 
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
 import io.github.jowgrin.imposingpdf.PDFServices.SplitedDocument;
 import io.github.jowgrin.imposingpdf.environment.PDFFile;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
@@ -14,8 +13,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Spinner;
@@ -28,7 +25,7 @@ public class SplitFileController extends SubController{
     private ComboBox<Tab> chooseFileComboBox;
 
     @FXML
-    private Text nameFileText;
+    private Text fileNameText;
     
     @FXML
     private Spinner<Integer> cutTo;
@@ -42,7 +39,8 @@ public class SplitFileController extends SubController{
     @FXML
     private TextField rangePageTextField;
     
-    private File selectedFile;
+    private PDFFile selectedFile;
+    private final String DEFAULT_FILENAME = "no file choosed";
     
     @FXML
     void initialize() {
@@ -51,17 +49,15 @@ public class SplitFileController extends SubController{
     
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
     }
     
     @FXML
     void choosedActiveFile(ActionEvent event) {
     	try {
-    		nameFileText.setText(chooseFileComboBox.getSelectionModel().getSelectedItem().getText());
+    		fileNameText.setText(chooseFileComboBox.getSelectionModel().getSelectedItem().getText());
     	} catch(NullPointerException e) {
-    		nameFileText.setText("no file choosed");
+    		fileNameText.setText(DEFAULT_FILENAME);
     	} finally {
     		selectedFile = null;
 		}
@@ -69,39 +65,38 @@ public class SplitFileController extends SubController{
     
     @FXML
     void pressedOpenLocalFile(ActionEvent event) {
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setTitle("select a file"); 
-    	fileChooser.setInitialDirectory(new File("."));
-    	fileChooser.getExtensionFilters().addAll(
-    	         new ExtensionFilter("PDF Files", "*.pdf"));
-    	         
-    	 selectedFile = fileChooser.showOpenDialog(getMainController().getSidebarContainer().getScene().getWindow());
-    	 if (selectedFile != null) {
-    		 nameFileText.setText(selectedFile.getName());
-    	 }
+    	try {
+    		selectedFile = openDialog();
+    		if (selectedFile != null)
+    			fileNameText.setText(selectedFile.getName());
+    	} catch(IOException e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+    	}
+    	
     }
     
     @FXML
     void pressedCutTo(ActionEvent event) {
-    	cutTo.setDisable(false);
-    	rangePageTextField.setDisable(true);
+    	disableNodes(1, cutTo, rangePageTextField);
     }
     
     @FXML
     void pressedExtractRange(ActionEvent event) {
-    	cutTo.setDisable(true);
-    	rangePageTextField.setDisable(false);
+    	disableNodes(2, cutTo, rangePageTextField);
     }
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedSplit(ActionEvent event) {
+
     	try{
     		PDFFile choosenFile = getSelectedPDFFile();
+    		updateStateLabel(StatusLabel.PROCESSING, "Spliting " + choosenFile.getName());
+    		
     		SplitedDocument sp = new SplitedDocument(choosenFile.getFile());
     		if (cutToButton.isSelected()) {
     			sp.setRange(false);
@@ -114,19 +109,21 @@ public class SplitFileController extends SubController{
     		
     		PDDocument[] files = sp.create();
     		for (int i = 0; i < files.length; i++) {
-    			getMainController().openFile(new PDFFile("Split-" + (i+1) + choosenFile.getName(), files[i]));
+    			openFile(new PDFFile("Split-" + (i+1) + choosenFile.getName(), files[i]));
     		}
+    		updateStateLabel(StatusLabel.FINISH, "Splited " + choosenFile.getName());
     		
-    	} catch(IllegalArgumentException | NullPointerException | IOException e) {
-    		e.printStackTrace();
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	}
     }
     
     private PDFFile getSelectedPDFFile() throws IOException {
-    	if (selectedFile != null) {
-    		return new PDFFile(selectedFile, false);
+    	if (fileNameText.getText().equals(DEFAULT_FILENAME) || selectedFile == null) {
+    		return getSelectedPDFFile(chooseFileComboBox);
     	}
-    	return getMainController().getPDFFile(nameFileText.getText());
+    	else
+    		return selectedFile;
     }
 }
 

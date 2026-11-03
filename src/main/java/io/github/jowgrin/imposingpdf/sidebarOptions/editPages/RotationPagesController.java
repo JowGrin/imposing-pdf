@@ -1,12 +1,7 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.editPages;
 
-import java.io.IOException;
+import java.io.Serializable;
 
-import io.github.jowgrin.imposingpdf.*;
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
-import io.github.jowgrin.imposingpdf.PDFServices.RotateDocument;
-import io.github.jowgrin.imposingpdf.environment.PDFFile;
-import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -17,9 +12,20 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Tab;
 
-public class RotationPagesController extends SubController{
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
+import io.github.jowgrin.imposingpdf.PDFServices.RotateDocument;
+import io.github.jowgrin.imposingpdf.environment.Operator;
+import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 
-    @FXML
+public class RotationPagesController extends SubController implements Operator, Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@FXML
     private ComboBox<Tab> chooseFileComboBox;
 
     @FXML
@@ -27,6 +33,7 @@ public class RotationPagesController extends SubController{
 
     @FXML
     private Spinner<Integer> seriesOf;
+   
     
     @FXML
     private ToggleGroup rotation;
@@ -39,14 +46,7 @@ public class RotationPagesController extends SubController{
         
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());    	
-    	chooseFileComboBox.setItems(getTabsList());
-    }
-    
-    @FXML
-    void pressedRotateSpecific(ActionEvent event) {
-    	orderSeries.setDisable(false);
+    	showActiveFile(chooseFileComboBox);
     }
 
     @FXML
@@ -56,20 +56,24 @@ public class RotationPagesController extends SubController{
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedRotate(ActionEvent event) {
     	try {
-	    	RotateDocument rd = new RotateDocument(getSelectedPDFFile(chooseFileComboBox).getFile());
-    		rd.setSeriesOf(seriesOf.getValue());
+    		PDFFile selectedFile = getSelectedPDFFile(chooseFileComboBox);
+    		updateStateLabel(StatusLabel.PROCESSING, "Rotating " + selectedFile.getName());
+
+	    	RotateDocument rd = new RotateDocument(selectedFile.getFile());
+	    	rd.setSeriesOf(seriesOf.getValue());
 			rd.setCommand(orderSeries.getText());
-			rd.setRotationAngle(muchRotation());
+	    	rd.setRotationAngle(muchRotation());
 			
-			getMainController().openFile(new PDFFile("Rotate-" + getSelectedPDFFile(chooseFileComboBox).getName(), rd.create()));
-    	} catch(IOException e) {
-    		e.printStackTrace();
+			openFile(new PDFFile("Rotate-" + getSelectedPDFFile(chooseFileComboBox).getName(), rd.create()));
+    		updateStateLabel(StatusLabel.FINISH, "Rotated " + selectedFile.getName());
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	}
     }
     
@@ -85,5 +89,8 @@ public class RotationPagesController extends SubController{
     	return 0;
     }
    
+    public String toString() {
+    	return "Rotate Pages";
+    }
 
 }

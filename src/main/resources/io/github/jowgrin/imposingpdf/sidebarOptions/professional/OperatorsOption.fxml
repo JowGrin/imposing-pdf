@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox styleClass="sidebar-root" stylesheets="@../../style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.jowgrin.imposingpdf.sidebarOptions.professional.OperatorsOptionController">
+    
+    <Label styleClass="sidebar-title" text="Operators List" />
+    <Separator />
+    
+    <VBox styleClass="sidebar-vbox">
+        <Label styleClass="sidebar-subtitle" text="Operators:" />
+      <Label prefWidth="220.0" text="Select one operator to add to your program" wrapText="true" />
+      <ListView fx:id="operatorsList" prefHeight="166.0" />
+      <HBox styleClass="sidebar-hbox" />
+    </VBox>
+
+</VBox>

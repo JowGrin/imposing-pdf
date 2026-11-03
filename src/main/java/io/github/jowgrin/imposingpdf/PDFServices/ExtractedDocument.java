@@ -1,5 +1,7 @@
 package io.github.jowgrin.imposingpdf.PDFServices;
 
+import io.github.jowgrin.imposingpdf.environment.Pattern;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.File;
@@ -29,14 +31,17 @@ public class ExtractedDocument {
 	}
 
 	public void setPattern(String pattern) {
-		if (!isPattern(pattern)) {
+		if (!Pattern.isPattern(pattern)) {
         	pattern = pattern + "_{n}";
         }
 		
-		this.pattern = ConvertToFormat(pattern);
+		this.pattern = Pattern.ConvertToFormat(pattern);
 	}
 	
 	public void save() throws IllegalArgumentException, IOException{
+		if (OutputDirectory == null) {
+			throw new IllegalArgumentException("The output folder is empty");
+		}
 		// בדיקה שהתיקייה קיימת, ואם לא - יצירתה
         if (!OutputDirectory.exists()) {
         	OutputDirectory.mkdirs();
@@ -66,32 +71,5 @@ public class ExtractedDocument {
             }
         }
     }
-	
-	/**
-	 * 
-	 * @param pattern name of file
-	 * @return true if it's legal pattern
-	 */
-	private static boolean isPattern(String pattern) {
-    	if (pattern == null)
-			return false;
-    	if (pattern.contains("{n}"))
-    		return true;
-    	return false;
-    }
-    
-    /**
-     * 
-     * @param pattren of string with {n}
-     * @return new string replaced all {n} to %d
-     */
-    private static String ConvertToFormat(String pattren) {
-		if (pattren == null || !pattren.contains("{n}"))
-			return pattren + "_%d";
-		
-    	pattren = pattren.replace('{', ',');
-		pattren = pattren.replace('}', ',');
-    	return pattren.replaceAll(",n,", "%d");
-	}
 
 }

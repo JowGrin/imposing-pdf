@@ -51,7 +51,7 @@
          <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
             <children>
                <RadioButton fx:id="radioButtonSpecificSize" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressedSpecificSize" prefHeight="18.0" prefWidth="74.0" text="Spesific:" toggleGroup="$optionSize" />
-               <HBox fx:id="hboxSpesificSize" alignment="CENTER_LEFT" styleClass="sidebar-hbox" visible="false">
+               <HBox fx:id="hboxSpesificSize" alignment="CENTER_LEFT" disable="true" styleClass="sidebar-hbox">
                   <children>
                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="H" />
                      <TextField fx:id="height" />
@@ -64,7 +64,7 @@
          <HBox alignment="CENTER_LEFT" styleClass="sidebar-hbox">
             <children>
                <RadioButton fx:id="radioButtonPercent" mnemonicParsing="false" onAction="#pressedPressent" text="Percents:" toggleGroup="$optionSize" />
-               <HBox fx:id="hboxPercent" styleClass="sidebar-hbox" visible="false">
+               <HBox fx:id="hboxPercent" alignment="CENTER_RIGHT" disable="true" styleClass="sidebar-hbox">
                   <children>
                      <TextField fx:id="textFieldPercent" prefHeight="26.0" prefWidth="53.0" />
                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="\%" />

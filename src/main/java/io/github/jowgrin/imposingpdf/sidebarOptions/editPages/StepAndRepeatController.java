@@ -1,11 +1,7 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.editPages;
-import io.github.jowgrin.imposingpdf.MainTabs.TabListCell;
-import io.github.jowgrin.imposingpdf.PDFServices.*;
-import io.github.jowgrin.imposingpdf.environment.PDFFile;
-import io.github.jowgrin.imposingpdf.environment.PageSize;
-import io.github.jowgrin.imposingpdf.environment.Unit;
-import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
-import javafx.collections.FXCollections;
+
+import java.io.Serializable;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -15,13 +11,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 
-import java.io.IOException;
-
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
-public class StepAndRepeatController extends SubController{
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
+import io.github.jowgrin.imposingpdf.PDFServices.*;
+import io.github.jowgrin.imposingpdf.environment.Operator;
+import io.github.jowgrin.imposingpdf.environment.PDFFile;
+import io.github.jowgrin.imposingpdf.environment.PageSize;
+import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
 
-    @FXML
+public class StepAndRepeatController extends SubController implements Operator, Serializable{
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@FXML
     private ComboBox<Tab> chooseFileComboBox;
 
     @FXML
@@ -51,43 +57,42 @@ public class StepAndRepeatController extends SubController{
     
     @FXML
     void initialize() {
-    	pageSize.setItems(FXCollections.observableArrayList(getSizesArrayList().getSizesArrayList()));
-    	pageSize.getSelectionModel().selectFirst();
-    	directionPage.setItems(FXCollections.observableArrayList("Tall", "Wide"));
-    	directionPage.getSelectionModel().selectLast();    	
+    	showPageSizes(pageSize);
+    	showOrientPage(directionPage);
     }
     
     @FXML
     void pressedChooseFile(MouseEvent event) {
-    	chooseFileComboBox.setCellFactory(listView -> new TabListCell());
-    	chooseFileComboBox.setButtonCell(new TabListCell());    	
-    	chooseFileComboBox.setItems(getTabsList());
+    	showActiveFile(chooseFileComboBox);
     }
     
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedFinish(ActionEvent event) {
     	try {
-    		Unit unit = getMainController().getDefaultUnit();
-    		StepAndRepeatDocument nd = new StepAndRepeatDocument(getSelectedPDFFile(chooseFileComboBox).getFile());
+    		PDFFile selectedFile = getSelectedPDFFile(chooseFileComboBox);
+    		updateStateLabel(StatusLabel.PROCESSING, "Step&Repeat " + selectedFile.getName());
+    		
+    		StepAndRepeatDocument nd = new StepAndRepeatDocument(selectedFile.getFile());
     		nd.setCols(colScale.getValue());
     		nd.setRows(rowScale.getValue());
-    		nd.setOuterMargin(unit.convertToPoints(Double.valueOf(outerMargin.getText())));
-    		nd.setInnerMargin(unit.convertToPoints(Double.valueOf(innerMargin.getText())));
+    		nd.setOuterMargin(convertToPoints(Double.valueOf(outerMargin.getText())));
+    		nd.setInnerMargin(convertToPoints(Double.valueOf(innerMargin.getText())));
     		nd.setTargetPageSize(getTagetPageSize());
     		nd.setLandscape(isLandscape());
     		nd.setKeepOriginalScale(keepOrginalScale.isSelected());
     		nd.setAddCropMarks(drawBordersAround.isSelected());
     	
     		
-    		getMainController().openFile(new PDFFile("StepRepeat-" + getSelectedPDFFile(chooseFileComboBox).getName(), nd.create()));
-    	} catch(IOException e) {
-    		e.printStackTrace();
+    		openFile(new PDFFile("StepRepeat-" + getSelectedPDFFile(chooseFileComboBox).getName(), nd.create()));
+    		updateStateLabel(StatusLabel.FINISH, "Step&Repeat " + selectedFile.getName());
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
     	}   
     }
     
@@ -99,6 +104,9 @@ public class StepAndRepeatController extends SubController{
     private boolean isLandscape() {
     	return directionPage.getSelectionModel().getSelectedItem().equals("Wide");
     }
-
+    
+    public String toString() {
+    	return "Step & Repeat Pages";
+    }
 }
 

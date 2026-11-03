@@ -1,0 +1,123 @@
+/* עיצוב כללי לשדה העבודה */
+.root {
+    -fx-background-color: #f3f2f1; /* רקע אפור בהיר מאוד בסגנון אופיס */
+    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+/* שורת התפריטים העליונה */
+.menu-bar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1px 0; /* קו תחתון עדין בלבד */
+    -fx-padding: 5px 10px;
+}
+
+.menu-bar .label {
+    -fx-text-fill: #323130;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.menu:hover, .menu:showing {
+    -fx-background-color: #f3f2f1;
+    -fx-background-radius: 4px;
+}
+
+.context-menu {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 6px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+    -fx-border-color: #d2d0ce;
+    -fx-border-width: 1px;
+    -fx-padding: 5px 0px;
+}
+
+.menu-item {
+    -fx-padding: 8px 20px;
+}
+
+.menu-item .label {
+    -fx-text-fill: #323130;
+    -fx-font-size: 13px;
+}
+
+.menu-item:focused {
+    -fx-background-color: #eaeaea;
+}
+
+/* רכיב הלשוניות (TabPane) */
+.tab-pane {
+    -fx-tab-max-height: 36px;
+}
+
+.tab-header-area {
+    -fx-padding: 10px 10px 0 10px;
+    -fx-background-color: #f3f2f1;
+}
+
+.tab-header-background {
+    -fx-background-color: transparent;
+}
+
+/* עיצוב לשונית רגילה */
+.tab {
+    -fx-background-color: #f3f2f1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px 4px 0 0;
+    -fx-padding: 6px 16px;
+    -fx-border-color: transparent;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #605e5c;
+    -fx-font-size: 13px;
+}
+
+/* לשונית במעבר עכבר */
+.tab:hover {
+    -fx-background-color: #f3f2f1;
+}
+
+/* לשונית פעילה/נבחרת */
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d2d0ce #d2d0ce transparent #d2d0ce;
+    -fx-border-width: 1px 1px 0 1px;
+    -fx-border-radius: 4px 4px 0 0;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #2b579a; /* כחול ייעודי המדגיש את הדף הנוכחי */
+    -fx-font-weight: bold;
+}
+
+/* אזור הטקסט / תוכן המסמך */
+.text-area {
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 0;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-padding: 5px;
+}
+
+.text-area .content {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4px;
+}
+
+/* עיצוב כפתור הסגירה של הלשונית */
+.tab .tab-close-button {
+    -fx-background-color: #605e5c;
+    -fx-shape: "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z";
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.tab .tab-close-button:hover {
+    -fx-background-color: #a80000;
+}
+
+page-sheet {
+	-fx-background-color: white;
+}

@@ -55,10 +55,13 @@ public class SplitedDocument {
 	}
 	
 	public PDDocument[] create() throws IllegalArgumentException{
-		PDDocument[] documents = new PDDocument[cutTo];
-		if (isRange)
-			 documents[0] = split(document, commands);
+		PDDocument[] documents;
+		if (isRange) {
+			documents = new PDDocument[1];
+			documents[0] = split(document, commands);
+		}
 		else {
+			documents = new PDDocument[cutTo];
 			int pages = document.getNumberOfPages();
 			int end;
 			for (int i = 0; i < cutTo; i++) {
@@ -87,7 +90,7 @@ public class SplitedDocument {
 				documentsArr[i] = split(file, Integer.valueOf(oneCommand[0]), Integer.valueOf(oneCommand[1]));
     		}
     		else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("The command is illegal");
     		}
 		}
     	
@@ -96,7 +99,7 @@ public class SplitedDocument {
     
     public static PDDocument split(PDDocument file, int start, int end) throws IllegalArgumentException{
     	if (start <= 0 || file.getNumberOfPages() < end || start > end)
-    		throw new IllegalArgumentException();
+    		throw new IllegalArgumentException("The pages is out of range");
     	
     	PDDocument newDoc = new PDDocument();
     	for(int i = start; i <= end; i++) {
@@ -104,29 +107,4 @@ public class SplitedDocument {
     	}
     	return newDoc;
     }
-
-	
-    
-    /*
-    public static void main(String[] args) {
-    	
-    	File f = new File("ew.pdf");
-    	File f2 = new File("Check.pdf");
-    	
-    	try {
-	    	SplitedDocument sd = new SplitedDocument(Loader.loadPDF(f));
-	    	sd.setCommands("1-2, 4-5");
-	    	
-	    	sd.create().save(f2);
-	    	
-	    	System.out.println("Seccsseffuly");
-	    	
-	    	
-	    	
-    	} catch(IOException e) {
-    		e.printStackTrace();
-    	}
-    	
-    }
-    */
 }

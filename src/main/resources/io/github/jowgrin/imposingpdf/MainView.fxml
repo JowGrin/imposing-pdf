@@ -39,7 +39,7 @@
                         <MenuItem onAction="#pressedExtract" text="Extract Pages" />
                     </items>
                 </Menu>
-                <Menu text="Edit Pages">
+                <Menu text="Impose">
                     <items>
                         <MenuItem onAction="#pressedNUP" text="N-Up Page" />
                         <MenuItem onAction="#pressedStepAndRepeat" text="Step &amp; Repeat" />
@@ -97,7 +97,7 @@
 
     <bottom>
         <HBox fx:id="statusBar" alignment="CENTER_LEFT" prefHeight="25.0" styleClass="status-bar">
-            <Label text="Ready" />
+            <Label fx:id="statusProcessLabel" text="Ready" />
             <Pane HBox.hgrow="ALWAYS" />
             <Label text="Units: " />
          <Label fx:id="unitDefault" text="Milimeter(mm)" />

@@ -1,5 +1,6 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.setting;
 
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
 import io.github.jowgrin.imposingpdf.environment.PageSize;
 import io.github.jowgrin.imposingpdf.environment.Unit;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
@@ -29,23 +30,18 @@ public class PageSizeSettingController extends SubController {
     
     @FXML
     void initialize() {
-    	unitComboBox.setItems(FXCollections.observableArrayList(getUnitsArrayList().getSizesArrayList()));
-    	unitComboBox.getSelectionModel().selectFirst();
+    	showUnits(unitComboBox);
     	showListView();
     }
     
     @FXML
     void pressedAddSize(ActionEvent event) {
-    	try {
-    		double heigh = Double.valueOf(heighPage.getText());
-    		double width = Double.valueOf(widthPage.getText());
-    		String name = newSizeName.getText();
-    		//PageSize.Unit unit = (unitComboBox.getSelectionModel().getSelectedItem().equals("mm"))? PageSize.Unit.CENTIMETER:PageSize.Unit.INCH; 
-    		
-    		getSizesArrayList().addSize(new PageSize(name, heigh, width, null));
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
+    	double heigh = Double.valueOf(heighPage.getText());
+		double width = Double.valueOf(widthPage.getText());
+		String name = newSizeName.getText();
+		Unit unit = unitComboBox.getSelectionModel().getSelectedItem();
+		
+		getSizesArrayList().addSize(new PageSize(name, heigh, width, unit));
     	clearUserData();
     	showListView();
     }
@@ -73,14 +69,21 @@ public class PageSizeSettingController extends SubController {
     
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedSave(ActionEvent event) {
-    	getSizesArrayList().save();
-    	getMainController().updateDefaultUnit();
-    	clearUserData();
+    	try {
+			updateStateLabel(StatusLabel.PROCESSING, "Saveing Sizes ");
+	    	updateSettingUserBackup();
+	    	updateUnitDefault();
+	    	clearUserData();
+			updateStateLabel(StatusLabel.FINISH, "Saved Sizes ");
+    	}catch(Exception e) {
+			updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+    		e.printStackTrace();
+    	}
     }
     
     private void clearUserData() {

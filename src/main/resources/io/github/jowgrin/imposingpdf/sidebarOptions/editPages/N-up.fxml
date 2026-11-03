@@ -48,9 +48,9 @@
          <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="230.0" styleClass="sidebar-hbox">
             <children>
                <Label text="Cols (X):" />
-               <Spinner fx:id="colScale" editable="true" initialValue="2" max="100" min="0" styleClass="sidebar-spinner" />
+               <Spinner fx:id="colScale" editable="true" initialValue="2" max="100" min="1" styleClass="sidebar-spinner" />
                <Label text="Rows (Y):" />
-               <Spinner fx:id="rowScale" editable="true" initialValue="1" max="100" min="0" styleClass="sidebar-spinner" />
+               <Spinner fx:id="rowScale" editable="true" initialValue="1" max="100" min="1" styleClass="sidebar-spinner" />
             </children>
          </HBox>
       </children>

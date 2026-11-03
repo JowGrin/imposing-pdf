@@ -18,7 +18,7 @@
            <Label styleClass="sidebar-subtitle" text="Select from Opened Documents:" />
          <HBox styleClass="sidebar-hbox">
             <children>
-               <ComboBox fx:id="chooseFileComboBox" maxWidth="1.7976931348623157E308" onMouseClicked="#pressedChooseFile" promptText="Choose active file..." styleClass="sidebar-button" />
+               <ComboBox fx:id="chooseFileComboBox" maxWidth="1.7976931348623157E308" onAction="#choosedActiveFile" onMouseClicked="#pressedChooseFile" promptText="Choose active file..." styleClass="sidebar-button" />
             </children>
          </HBox>
       </children>
@@ -32,7 +32,7 @@
       <children>
          <Label minWidth="-Infinity" styleClass="sidebar-subtitle" text="File to Extract:">
          </Label>
-         <Text fx:id="fileNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="no file selected" />
+         <Text fx:id="fileNameText" fill="#0ec448" strokeType="OUTSIDE" strokeWidth="0.0" text="no file selected" />
       </children>
    </HBox>
    <Separator prefWidth="200.0" />

@@ -1,5 +1,6 @@
 package io.github.jowgrin.imposingpdf.sidebarOptions.setting;
 
+import io.github.jowgrin.imposingpdf.MainViewController.StatusLabel;
 import io.github.jowgrin.imposingpdf.environment.Unit;
 import io.github.jowgrin.imposingpdf.environment.UnitListCell;
 import io.github.jowgrin.imposingpdf.sidebarOptions.SubController;
@@ -30,20 +31,15 @@ public class DefineUnitSettingController extends SubController{
     
     @FXML
     void pressedAddUnit(ActionEvent event) {
-    	try {
-    		double mmInUnit = Double.valueOf(manyMmInNewUnit.getText());   		
-    		String name = newUnitName.getText();
-    		String nickname = unitNickname.getText();
-    		
-    		if (nickname.isEmpty())
-    			getUnitsArrayList().addSize(new Unit(name, mmInUnit));
-    		else
-    			getUnitsArrayList().addSize(new Unit(name, nickname,mmInUnit));
-    		
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    	}
-    	clearUserData();
+    	double mmInUnit = Double.valueOf(manyMmInNewUnit.getText());   		
+		String name = newUnitName.getText();
+		String nickname = unitNickname.getText();
+		
+		if (nickname.isEmpty())
+			getUnitsArrayList().addSize(new Unit(name, mmInUnit));
+		else
+			getUnitsArrayList().addSize(new Unit(name, nickname,mmInUnit));
+		clearUserData();
     	showListView();
     }
     
@@ -71,14 +67,21 @@ public class DefineUnitSettingController extends SubController{
 
     @FXML
     void pressedCancel(ActionEvent event) {
-    	getMainController().initialSidebar();
+    	pressedCancel();
     }
 
     @FXML
     void pressedSave(ActionEvent event) {
-    	getUnitsArrayList().save();
-    	getMainController().updateDefaultUnit();
-    	clearUserData();
+    	try {
+    		updateStateLabel(StatusLabel.PROCESSING, "Saveing units ");
+	    	updateSettingUserBackup();
+	    	updateUnitDefault();
+	    	clearUserData();
+			updateStateLabel(StatusLabel.FINISH, "Saved units ");
+    	} catch(Exception e) {
+    		updateStateLabel(StatusLabel.FAILURE, e.getMessage());
+    		e.printStackTrace();
+    	}
     }
     
     private void clearUserData() {
@@ -87,9 +90,7 @@ public class DefineUnitSettingController extends SubController{
     }
     
     private void showListView() {
-    	unitsListView.setCellFactory(listView -> new UnitListCell());
+    	unitsListView.setCellFactory(_ -> new UnitListCell());
     	unitsListView.setItems(FXCollections.observableArrayList(getUnitsArrayList().getSizesArrayList()));
     }
-
-
 }
